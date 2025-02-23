@@ -1,26 +1,9 @@
-/*
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_events.h>
-#include <SDL2/SDL_keycode.h>
-#include <SDL2/SDL_mouse.h>
-#include <SDL2/SDL_pixels.h>
-#include <SDL2/SDL_rect.h>
-#include <SDL2/SDL_render.h>
-#include <SDL2/SDL_stdinc.h>
-#include <SDL2/SDL_surface.h>
-#include <SDL2/SDL_timer.h>
-#include <SDL2/SDL_video.h>
-#include <SDL2/SDL_ttf.h>
-*/
-
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 
 #include "dict.h"
 #include "view.h"
-
-dict_t* ALL_HASH;
 
 FILE* run(char* cmd) {
   FILE* fp = popen(cmd, "r");
@@ -110,14 +93,16 @@ commit_t* init_commit(char* hash) {
   }
   pclose(fp);
 
-  commit->parents = (char**) malloc(sizeof(char*)*commit->nb_parent);
-  commit->nb_parent = 0;
-  fp = git_cat('p', hash);
-  while (fgets(line, sizeof(line), fp)) {
-    if (strncmp(line, "parent", 6) == 0) {
-      commit->parents[commit->nb_parent] = (char*) malloc(sizeof(char)*41);
-      hashcpy(commit->parents[commit->nb_parent], &line[7]);
-      commit->nb_parent++;
+  if (commit->nb_parent != 0) {
+    commit->parents = (char**) malloc(sizeof(char*)*commit->nb_parent);
+    commit->nb_parent = 0;
+    fp = git_cat('p', hash);
+    while (fgets(line, sizeof(line), fp)) {
+      if (strncmp(line, "parent", 6) == 0) {
+        commit->parents[commit->nb_parent] = (char*) malloc(sizeof(char)*41);
+        hashcpy(commit->parents[commit->nb_parent], &line[7]);
+        commit->nb_parent++;
+      }
     }
   }
 
@@ -145,6 +130,14 @@ void free_commit(commit_t* c) {
   free(c);
 }
 
+void free_elem(void* elem_v) {
+  elem_t* elem = (elem_t*) elem_v;
+  if (elem->type == COMMIT) free_commit((commit_t*) elem->data);
+  else if (elem->type == TREE) free_tree((tree_t*) elem->data);
+  else if (elem->type == BLOB) free_blob((blob_t*) elem->data);
+  free(elem);
+}
+
 void print_debut(int prof) {
   for (int i=0; i<prof; i++) printf("| ");
 }
@@ -154,34 +147,34 @@ void print_blob(blob_t* b, int prof) {
   printf("%s (%s)\n", b->name, b->hash);
 }
 
-void print_tree(tree_t* t, int prof) {
+void print_tree(dict_t* all_hashes, tree_t* t, int prof) {
   print_debut(prof);
   printf("%s (%s)\n", t->name, t->hash);
   for (int i=0; i<t->nb_blob; i++) {
-    blob_t* blob = (blob_t*) get_dict(ALL_HASH, t->blobs[i]);
+    blob_t* blob = (blob_t*) get_dict(all_hashes, t->blobs[i]);
     print_blob(blob, prof+1);
   }
   for (int i=0; i<t->nb_tree; i++) {
-    tree_t* tree = (tree_t*) get_dict(ALL_HASH, t->trees[i]);
-    print_tree(tree, prof+1);
+    tree_t* tree = (tree_t*) get_dict(all_hashes, t->trees[i]);
+    print_tree(all_hashes, tree, prof+1);
   }
 }
 
-void print_commit(commit_t* c, int prof) {
+void print_commit(dict_t* all_hashes, commit_t* c, int prof) {
   print_debut(prof);
   printf("%s\n", c->hash);
-  tree_t* tree = (tree_t*) get_dict(ALL_HASH, c->tree);
-  print_tree(tree, prof+1);
+  tree_t* tree = (tree_t*) get_dict(all_hashes, c->tree);
+  print_tree(all_hashes, tree, prof+1);
   printf("\n");
   for (int i=0; i<c->nb_parent; i++) {
-    commit_t* co = (commit_t*) get_dict(ALL_HASH, c->parents[i]);
-    print_commit(co, prof);
+    commit_t* co = (commit_t*) get_dict(all_hashes, c->parents[i]);
+    print_commit(all_hashes, co, prof);
   }
 }
 
-int main() {
+char* get_hashes(dict_t* all_hashes) {
   FILE* fp;
-  char commit_hash[41];
+  char* commit_hash = (char*) malloc(sizeof(char)*41);
   char hash[42];
 
   /* Open the command for reading. */
@@ -198,7 +191,6 @@ int main() {
 
   fp = run("/usr/bin/git rev-list --objects --all");
 
-  ALL_HASH = init_dict();
   char line[1000];
   while(fgets(line, sizeof(line), fp)) {
     char hash[41];
@@ -227,13 +219,7 @@ int main() {
     } else if (type == TREE) elem = init_tree(hash, name);
     else if (type == BLOB) elem = init_blob(hash, name);
 
-    add_dict(ALL_HASH, hash, type, elem);
+    add_dict(all_hashes, hash, type, elem);
   }
-
-  //printf("%s", hash);
-  commit_t* c = (commit_t*) get_dict(ALL_HASH, commit_hash);
-  print_commit(c, 0);
-  free_commit(c);
-
-  return 0;
+  return commit_hash;
 }

@@ -31,6 +31,6 @@ typedef struct dict_s dict_t;
 dict_t* init_dict();
 void add_dict(dict_t* d, char hash[41], type t, void* data);
 elem_t* get_dict(dict_t* d, char hash[41]);
-
+void free_dict(dict_t* d, void free_elem(void*));
 
 #endif // DICT_H

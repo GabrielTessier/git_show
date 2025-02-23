@@ -1,7 +1,7 @@
 
 
 # Pour compiler
-`gcc -o view view.c dict.c`
+`make`
 
 # Pour exécuter
-Pour exécuter allez dans un repo git puis `/path/to/file/view`
+Pour exécuter allez dans un repo git puis `/path/to/file/git_show`

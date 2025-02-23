@@ -57,3 +57,15 @@ elem_t* get_dict(dict_t* d, char hash[41]) {
   }
   return NULL;
 }
+
+void free_dict(dict_t* d, void free_elem (void*)) {
+  for (int i=0; i<DICT_SIZE; i++) {
+    for (int j=0; j<d->tab[i]->size; j++) {
+      if (free_elem != NULL) free_elem(d->tab[i]->data[j]);
+    }
+    free(d->tab[i]->data);
+    free(d->tab[i]);
+  }
+  free(d->tab);
+  //free(d);
+}

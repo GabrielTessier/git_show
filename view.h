@@ -40,8 +40,9 @@ void free_blob(blob_t* b);
 void free_tree(tree_t* t);
 void free_commit(commit_t* c);
 void print_blob(blob_t* b, int prof);
-void print_tree(tree_t* t, int prof);
-void print_commit(commit_t* c, int prof);
-
+void print_tree(dict_t* all_hashes, tree_t* t, int prof);
+void print_commit(dict_t* all_hashes, commit_t* c, int prof);
+void free_elem(void* elem_v);
+char* get_hashes(dict_t* all_hashes);
 
 #endif // VIEW_H
