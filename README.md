@@ -4,4 +4,4 @@
 `make`
 
 # Pour exécuter
-Pour exécuter allez dans un repo git puis `/path/to/file/git_show`
+Exécuter le fichier `build/git_show` depuis un repo git.

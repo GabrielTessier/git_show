@@ -1,10 +1,10 @@
 
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_keycode.h>
 #include <stdlib.h>
 
 #include "dict.h"
 #include "view.h"
-#include "sdl_utils.h"
 #include "window.h"
 
 
@@ -79,74 +79,4 @@ int draw_commit(SDL_Renderer* renderer, dict_t* all_hashes, commit_t* c, int siz
   if (prx != NULL) *prx = test_rect.x;
   if (pry != NULL) *pry = test_rect.y;
   return size;
-}
-
-int main() {
-  dict_t* all_hashes = init_dict();;
-  char* commit_hash = get_hashes(all_hashes);
-  commit_t* c = (commit_t*) get_dict(all_hashes, commit_hash);
-  print_commit(all_hashes, c, 0);
-
-  SDL_Init(SDL_INIT_EVERYTHING);
-  SDL_Window* window;
-  SDL_Renderer* renderer;
-  SDL_DisplayMode mode;
-  SDL_GetCurrentDisplayMode(0, &mode);
-  //int screen_width = mode.w;
-  //int screen_height = mode.h;
-  int window_width = 1000;
-  int window_height = 1000;
-  SDL_CreateWindowAndRenderer(window_width, window_height, SDL_WINDOW_SHOWN, &window, &renderer);
-
-  SDL_bool is_running = SDL_TRUE;
-  SDL_Event event;
-
-  int x = 100;
-  int y = 100;
-  int size = 50;
-
-  while (is_running) {
-    SDL_SetRenderDrawColor(renderer, 180, 180, 180, 255);
-    SDL_RenderClear(renderer);
-
-    draw_commit(renderer, all_hashes, c, size, x, y, NULL, NULL);
-
-    while (SDL_PollEvent(&event)) {
-      switch ((&event)->type) {
-      case SDL_KEYDOWN:
-        switch ((&event)->key.keysym.sym) {
-        case SDLK_LEFT :
-          x += 100;
-          break;
-        case SDLK_RIGHT :
-          x -= 100;
-          break;
-        case SDLK_UP:
-          size += 10;
-          break;
-        case SDLK_DOWN:
-          size -= 10;
-          if (size <= 0) size = 1;
-          break;
-        case SDLK_ESCAPE :
-          is_running = SDL_FALSE;
-          break;
-        }
-        break;
-      }
-    }
-
-
-    //poll_event(&event, &is_running);
-    SDL_RenderPresent(renderer);
-  }
-
-  SDL_DestroyRenderer(renderer);
-  SDL_DestroyWindow(window);
-  SDL_Quit();
-
-  free_dict(all_hashes, free_elem);
-  free(commit_hash);
-
-  return 0;
 }
