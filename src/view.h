@@ -2,6 +2,7 @@
 #ifndef VIEW_H
 #define VIEW_H
 
+#include <stdio.h>
 #include "dict.h"
 
 struct blob_s {

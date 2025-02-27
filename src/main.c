@@ -1,16 +1,17 @@
 
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_ttf.h>
 
 #include "dict.h"
 #include "view.h"
-#include "window.h"
-#include "sdl_utils.h"
+#include "window_commit_content.h"
+#include "window_list_commit.h"
 
 int main() {
   dict_t* all_hashes = init_dict();;
   char* commit_hash = get_hashes(all_hashes);
-  commit_t* c = (commit_t*) get_dict(all_hashes, commit_hash);
-  print_commit(all_hashes, c, 0);
+  commit_t* HEAD = (commit_t*) get_dict(all_hashes, commit_hash);
+  //print_commit(all_hashes, c, 0);
 
   SDL_Init(SDL_INIT_EVERYTHING);
   SDL_Window* window;
@@ -23,54 +24,28 @@ int main() {
   int window_height = 1000;
   SDL_CreateWindowAndRenderer(window_width, window_height, SDL_WINDOW_SHOWN, &window, &renderer);
 
-  SDL_bool is_running = SDL_TRUE;
-  SDL_Event event;
+  TTF_Init();
+  TTF_Font *liberation = TTF_OpenFont("fonts/liberation-fonts-ttf-2.1.5/LiberationSerif-Regular.ttf", 24);
 
-  int x = 100;
-  int y = 100;
-  int size = 50;
+  int window_to_draw = 1;
+  commit_t* commit = HEAD;
 
-  keys_t* keys = init_keys();
-
-  while (is_running) {
-    SDL_SetRenderDrawColor(renderer, 180, 180, 180, 255);
-    SDL_RenderClear(renderer);
-
-    draw_commit(renderer, all_hashes, c, size, x, y, NULL, NULL);
-
-    is_running = !poll_event(&event, keys);
-
-    for (int i = 0; i < keys->keys_down->size; i++) {
-      switch (keys->keys_down->keys[i]) {
-      case SDLK_LEFT:
-        x += 100;
-        break;
-      case SDLK_RIGHT :
-        x -= 100;
-        break;
-      case SDLK_UP:
-        size += 10;
-        break;
-      case SDLK_DOWN:
-        size -= 10;
-        if (size <= 0) size = 1;
-        break;
-      case SDLK_ESCAPE :
-        is_running = SDL_FALSE;
-        break;
-      default:
-        break;
-      }
+  while (1) {
+    switch (window_to_draw) {
+    case 1:
+      window_list_commit(&window_to_draw, renderer, all_hashes, HEAD, liberation, &commit);
+      break;
+    case 2:
+      window_commit_content(&window_to_draw, renderer, all_hashes, commit, liberation);
+      break;
+    default:
+      goto end;
     }
-
-    SDL_RenderPresent(renderer);
   }
-
+ end:
   SDL_DestroyRenderer(renderer);
   SDL_DestroyWindow(window);
   SDL_Quit();
-
-  free_keys(keys);
 
   free_dict(all_hashes, free_elem);
   free(commit_hash);

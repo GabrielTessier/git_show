@@ -1,6 +1,6 @@
 
 FLAGS = -Wall -Wextra -fsanitize=address,undefined -g
-LIBS = -lSDL2
+LIBS = -lSDL2 -lSDL2_ttf
 
 SOURCE_DIR = src
 BUILD_DIR = build
