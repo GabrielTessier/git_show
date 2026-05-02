@@ -2,6 +2,9 @@
 FLAGS = -Wall -Wextra -fsanitize=address,undefined -g
 LIBS = -lSDL2 -lSDL2_ttf
 
+FLAGS += $(shell pkg-config --cflags sdl2 SDL2_ttf)
+LIBS += $(shell pkg-config --libs sdl2 SDL2_ttf)
+
 SOURCE_DIR = src
 BUILD_DIR = build
 OBJ_DIR = $(BUILD_DIR)/obj

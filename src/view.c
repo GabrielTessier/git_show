@@ -20,10 +20,10 @@ void hashcpy(char* h1, char* h2) {
 }
 
 FILE* git_cat(char param, char hash[41]) {
-  char cmd[67];
+  char cmd[71];
   cmd[0] = 0;
-  strcat(cmd, "/usr/bin/git cat-file -? ");
-  cmd[23] = param;
+  strcat(cmd, "/usr/bin/env git cat-file -? ");
+  cmd[27] = param;
   strncat(cmd, hash, 41);
   FILE* fp = run(cmd);
   return fp;
@@ -178,7 +178,7 @@ char* get_hashes(dict_t* all_hashes) {
   char hash[42];
 
   /* Open the command for reading. */
-  fp = run("/usr/bin/git rev-parse HEAD 2>/dev/null");
+  fp = run("/usr/bin/env git rev-parse HEAD 2>/dev/null");
 
   /* Read the output a line at a time - output it. */
   fgets(hash, sizeof(hash), fp);
@@ -189,7 +189,7 @@ char* get_hashes(dict_t* all_hashes) {
   }
   hashcpy(commit_hash, hash);
 
-  fp = run("/usr/bin/git rev-list --objects --all");
+  fp = run("/usr/bin/env git rev-list --objects --all");
 
   char line[1000];
   while(fgets(line, sizeof(line), fp)) {
