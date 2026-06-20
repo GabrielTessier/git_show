@@ -11,7 +11,7 @@ OBJ_DIR = $(BUILD_DIR)/obj
 SRC = $(wildcard $(SOURCE_DIR)/*.c)
 OBJ = $(SRC:$(SOURCE_DIR)/%.c=$(OBJ_DIR)/%.o)
 
-git_show : $(OBJ)
+git_tree : $(OBJ)
 	mkdir -p build
 	gcc $(FLAGS) -o $(BUILD_DIR)/$@ $^ $(LIBS)
 
@@ -23,4 +23,4 @@ clean :
 	rm -rfv ./build
 
 run :
-	./$(BUILD_DIR)/git_show
+	./$(BUILD_DIR)/git_tree
