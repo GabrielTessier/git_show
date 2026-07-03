@@ -1,7 +1,7 @@
 
 
-# Pour compiler
+# Compile
 `make`
 
-# Pour exécuter
-`. /path/to/repo/build/git_show` depuis un repo git (en remplaçant `path/to/repo` par le chemin absolu vers le repo).
+# Run
+`./build/git_show path/to/repo/to/show`
