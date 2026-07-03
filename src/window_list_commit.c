@@ -84,6 +84,8 @@ int window_list_commit(int *window_to_draw, SDL_Renderer *renderer, dict_t *all_
   SDL_bool is_running = SDL_TRUE;
   SDL_Event event;
   keys_t *keys = init_keys();
+  
+  uint64_t time = SDL_GetTicks64();
   while (is_running) {
     SDL_SetRenderDrawColor(renderer, 180, 180, 180, 255);
     SDL_RenderClear(renderer);
@@ -140,6 +142,13 @@ int window_list_commit(int *window_to_draw, SDL_Renderer *renderer, dict_t *all_
     }
 
     SDL_RenderPresent(renderer);
+    
+    // Max 30 fps
+    uint64_t nextTime = SDL_GetTicks64();
+    int delta = nextTime - time;
+    int delay = 1000/30 - delta;
+    if (delay > 0) SDL_Delay(delay);
+    time = SDL_GetTicks64();
   }
   free_keys(keys);
 
