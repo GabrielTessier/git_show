@@ -1,6 +1,6 @@
 
 FLAGS = -Wall -Wextra -fsanitize=address,undefined -g
-LIBS = -lSDL2 -lSDL2_ttf
+LIBS =
 
 FLAGS += $(shell pkg-config --cflags sdl2 SDL2_ttf)
 LIBS += $(shell pkg-config --libs sdl2 SDL2_ttf)
