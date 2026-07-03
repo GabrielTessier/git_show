@@ -8,7 +8,7 @@
 FILE* run(char* cmd) {
   FILE* fp = popen(cmd, "r");
   if (fp == NULL) {
-    printf("Failed to run command\n" );
+    fprintf(stderr, "Failed to run command : %s\n", cmd);
     exit(1);
   }
   return fp;
@@ -104,6 +104,7 @@ commit_t* init_commit(char* hash) {
         commit->nb_parent++;
       }
     }
+    pclose(fp);
   }
 
   return commit;
@@ -206,6 +207,7 @@ char* get_hashes(dict_t* all_hashes) {
     char str_type[10];
     type type = 0;
     fgets(str_type, sizeof(str_type), fp_type);
+    pclose(fp_type);
     if (strncmp(str_type, "commit", 6) == 0) type = COMMIT;
     else if (strncmp(str_type, "tree", 4) == 0) type = TREE;
     else if (strncmp(str_type, "blob", 4) == 0) type = BLOB;
