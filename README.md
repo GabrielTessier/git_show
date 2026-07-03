@@ -4,7 +4,7 @@
 `make`
 
 # Run
-`./build/git_show path/to/repo/to/show`
+`./build/git_tree path/to/repo/to/show`
 
 # Use
 e : zoom in  
