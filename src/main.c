@@ -26,7 +26,7 @@ int main(int argc, char **argv) {
   }
 
   if (chdir(argv[1]) < 0) {
-    perror("chdir");
+    perror(argv[1]);
     TTF_CloseFont(liberation);
     TTF_Quit();
     return 1;
