@@ -223,5 +223,6 @@ char* get_hashes(dict_t* all_hashes) {
 
     add_dict(all_hashes, hash, type, elem);
   }
+  pclose(fp);
   return commit_hash;
 }
